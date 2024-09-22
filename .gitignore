@@ -1,0 +1,7 @@
+*.exe
+*.o
+a.out
+1_*
+1.py
+tempCodeRunnerFile.cpp
+generator.cpp
