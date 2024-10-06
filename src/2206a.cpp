@@ -21,7 +21,7 @@ int main() {
   for (int i = 0; i < r; i++) {
     cin >> t;
     for (int j = 0; j < c; j++)
-      board[i * r + j] = (int)t[j] - 48;
+      board[i * r + j] = (int)t[j] - '0';
   }
 
   q.push(make_pair(0, 1));
