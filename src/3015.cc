@@ -4,15 +4,19 @@
 #include <string>
 #include <vector>
 
+using namespace std;
+
 #define fi first
 #define se second
 typedef long long ll;
+typedef pair<int, int> pp;
 
-using namespace std;
-
-int n, c;
+int n;
+ll c;
 vector<int> v(500000);
 stack<int> st;
+stack<int> sa; // 같은 키 사람의 수, 현재 카운트는 제외
+int same;
 
 int main() {
   cin.tie(0), cout.tie(0), ios::sync_with_stdio(0);
@@ -20,23 +24,53 @@ int main() {
   cin >> n;
   for (int i = 0; i < n; i++) {
     cin >> v[i];
-    if (st.empty())
+    if (st.empty()) {
       st.push(i);
-    else if (v[st.top()] > v[i])
-      st.push(i), c++;
-    else if (v[st.top()] == v[i]) {
-      ;
-    } else {
-      while (!st.empty() && v[st.top()] <= v[i]) {
-        st.pop(), c++;
+      same = 1;
+
+    } else if (v[st.top()] > v[i]) { // shorter person
+      st.push(i);
+      sa.push(same);
+      // c += same;
+      c++;
+      cout << 's' << 1 << '/';
+      same = 1;
+
+    } else if (v[st.top()] == v[i]) { // same person
+      st.push(i);
+      cout << '=' << same << '+' << (sa.empty() ? 0 : sa.top()) << '/';
+      c += same++ + (sa.empty() ? 0 : sa.top());
+
+    } else { // taller person
+      while (!st.empty() && v[st.top()] < v[i]) {
+        while (same--) {
+          st.pop();
+          c++;
+        }
+        if (sa.empty())
+          same = 0;
+        else
+          same = sa.top(), sa.pop();
       }
-      if (!st.empty())
-        c++;
-      st.push(i);
+
+      if (!st.empty()) {
+        if (v[st.top()] == v[i]) {
+          st.push(i);
+          c += same++ + (sa.empty() ? 0 : sa.top());
+        } else {
+          st.push(i);
+          sa.push(same);
+          same = 1;
+          c++;
+        }
+      } else {
+        st.push(i);
+        same = 1;
+      }
     }
   }
   // cout << st.size() << endl;
-  cout << c;
+  cout << endl << c << endl;
 
   return 0;
 }
