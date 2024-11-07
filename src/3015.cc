@@ -25,23 +25,24 @@ int main() {
   for (int i = 0; i < n; i++) {
     cin >> v[i];
     if (st.empty()) {
+      // cout << "st/";
       st.push(i);
       same = 1;
 
     } else if (v[st.top()] > v[i]) { // shorter person
       st.push(i);
       sa.push(same);
-      // c += same;
       c++;
-      cout << 's' << 1 << '/';
+      // cout << "sh1/";
       same = 1;
 
     } else if (v[st.top()] == v[i]) { // same person
       st.push(i);
-      cout << '=' << same << '+' << (sa.empty() ? 0 : sa.top()) << '/';
-      c += same++ + (sa.empty() ? 0 : sa.top());
+      // cout << '=' << same << '+' << (sa.empty() ? 0 : 1) << '/';
+      c += same++ + (sa.empty() ? 0 : 1);
 
     } else { // taller person
+      // cout << "tall/";
       while (!st.empty() && v[st.top()] < v[i]) {
         while (same--) {
           st.pop();
@@ -56,7 +57,7 @@ int main() {
       if (!st.empty()) {
         if (v[st.top()] == v[i]) {
           st.push(i);
-          c += same++ + (sa.empty() ? 0 : sa.top());
+          c += same++ + (sa.empty() ? 0 : 1);
         } else {
           st.push(i);
           sa.push(same);
@@ -70,7 +71,7 @@ int main() {
     }
   }
   // cout << st.size() << endl;
-  cout << endl << c << endl;
+  cout << c << endl;
 
   return 0;
 }
