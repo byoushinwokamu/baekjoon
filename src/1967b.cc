@@ -12,34 +12,32 @@ typedef long long ll;
 typedef pair<int, int> pp;
 
 vector<vector<pp>> adj(100001);
-vector<bool> vis(100001);
-int v, a, b, c, mdis, farnode;
+vector<int> vis(100001);
+int n, a, b, c, mdis, farnode;
 
 void dfs(int now, int dis) {
-  if (mdis < dis) {
-    mdis = dis;
-    farnode = now;
-  }
+  int cnt = 0;
   for (auto a : adj[now]) {
     if (vis[a.fi])
       continue;
+    cnt++;
     vis[a.fi] = true;
     dfs(a.fi, a.se + dis);
     vis[a.fi] = false;
+  }
+  if (!cnt && mdis < dis) {
+    mdis = dis;
+    farnode = now;
   }
 }
 
 int main() {
   cin.tie(0), cout.tie(0), ios::sync_with_stdio(0);
-  cin >> v;
-  for (int i = 0; i < v; i++) {
-    cin >> a;
-    cin >> b;
-    while (b != -1) {
-      cin >> c;
-      adj[a].push_back({b, c});
-      cin >> b;
-    }
+  cin >> n;
+  for (int i = 0; i < n - 1; i++) {
+    cin >> a >> b >> c;
+    adj[a].push_back({b, c});
+    adj[b].push_back({a, c});
   }
   vis[1] = true;
   dfs(1, 0);
