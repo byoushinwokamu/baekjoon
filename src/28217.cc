@@ -12,7 +12,7 @@ typedef long long ll;
 typedef pair<int, int> pp;
 
 ll n, a, b;
-int gs[11] = {0, 1, 3, 6, 10, 15, 21, 34, 45, 55};
+int gs[11] = {0, 1, 3, 6, 10, 15, 21, 28, 35, 45, 55};
 int md = 60;
 
 ll rotate(ll z, ll n, ll o) {
