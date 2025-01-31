@@ -1,0 +1,16 @@
+#!/bin/bash
+
+if [ $# -lt 1 ]; then
+    echo "ERROR: Too few arguments"
+    exit 1
+fi
+
+TEMPLATE=~/baekjoon/src/templete.cc
+TARGET=~/baekjoon/src/$1.cc
+LINK=~/baekjoon/focus.cc
+
+echo "// BOJ $1" > "$TARGET"
+cat "$TEMPLATE" >> "$TARGET"
+
+ln -f "$TARGET" "$LINK"
+
