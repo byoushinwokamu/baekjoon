@@ -9,8 +9,11 @@ TEMPLATE=~/baekjoon/src/templete.cc
 TARGET=~/baekjoon/src/$1.cc
 LINK=~/baekjoon/focus.cc
 
-echo "// BOJ $1" > "$TARGET"
-cat "$TEMPLATE" >> "$TARGET"
+if [ ! -f "$TARGET" ]; then
+    echo "// BOJ $1" > "$TARGET"
+    cat "$TEMPLATE" >> "$TARGET"
+    echo "Created file $1.cc"
+fi
 
 ln -f "$TARGET" "$LINK"
 
