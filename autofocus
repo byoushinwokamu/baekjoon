@@ -13,6 +13,8 @@ if [ ! -f "$TARGET" ]; then
     echo "// BOJ $1" > "$TARGET"
     cat "$TEMPLATE" >> "$TARGET"
     echo "Created file $1.cc"
+else
+    echo "Loaded file $1.cc"
 fi
 
 ln -f "$TARGET" "$LINK"
