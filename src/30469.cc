@@ -34,20 +34,24 @@ void dfs(int idx) {
 int main() {
   cin.tie(0), cout.tie(0), ios::sync_with_stdio(0);
   adj[1] = {1, 3, 7, 9};
-  adj[2] = {3, 9};
   adj[3] = {1, 7};
-  adj[4] = {1, 3, 7};
-  adj[5] = {3, 9};
-  adj[6] = {1, 7};
   adj[7] = {1, 3, 9};
-  adj[8] = {3, 9};
   adj[9] = {7};
   cin >> a >> b >> n;
   s.resize(n - 1);
   s[0] = a[0], s[1] = a[1];
 
-  dfs(2);
-  cout << -1;
+  switch (b[0] - '0') {
+  case 2:
+  case 4:
+  case 5:
+  case 6:
+  case 8:
+    cout << -1;
+    break;
+  default:
+    dfs(2);
+  }
 
   return 0;
 }
