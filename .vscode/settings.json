@@ -3,6 +3,7 @@
 		"*.m": "matlab",
 		"array": "cpp",
 		"string_view": "cpp",
-		"type_traits": "cpp"
+		"type_traits": "cpp",
+		"iostream": "cpp"
 	}
 }

@@ -1,3 +1,4 @@
+// BOJ 6616
 #include <algorithm>
 #include <iostream>
 #include <string>
@@ -16,15 +17,19 @@ int main() {
     getline(cin, s);
     while ((a = find(s.begin(), s.end(), ' ')) != s.end())
       s.erase(a);
+    transform(s.begin(), s.end(), s.begin(), ::toupper);
 
-    vector<char> v(s.length());
-    int len = s.length() / n;
+    string v;
+    v.resize(s.length());
+    int cur = 0;
+    int cycle = 0;
     for (int i = 0; i < s.length(); i++) {
-      v[i] = s[(i % n) * (len) + (i / n)];
+      v[cur] = s[i];
+      cur += n;
+      if (cur >= v.length())
+        cur = ++cycle;
     }
-    for (auto a : v)
-      cout << a;
-    cout << '\n';
+    cout << v << '\n';
 
     cin >> n;
   }
