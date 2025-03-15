@@ -1,21 +1,59 @@
 #!/bin/bash
 
-if [ $# -lt 1 ]; then
-    echo "ERROR: Too few arguments"
+# 사용법 출력 함수
+usage() {
+    echo "Usage: $0 [-p] <problem_number>"
+    echo "  -p : Create a Python file instead of a C++ file"
     exit 1
+}
+
+# 옵션 파싱
+PYTHON_MODE=false
+
+while getopts "p" opt; do
+    case ${opt} in
+        p ) PYTHON_MODE=true ;;
+        * ) usage ;;
+    esac
+done
+shift $((OPTIND -1)) # 옵션을 처리한 후 인자 이동
+
+# 문제 번호 확인
+if [ $# -lt 1 ]; then
+    usage
 fi
 
-TEMPLATE=~/baekjoon/src/templete.cc
-TARGET=~/baekjoon/src/$1.cc
-LINK=~/baekjoon/focus.cc
+PROBLEM_NUM=$1
+BASE_DIR=~/baekjoon/src
+FOCUS_LINK=~/baekjoon/focus
 
-if [ ! -f "$TARGET" ]; then
-    echo "// BOJ $1" > "$TARGET"
-    cat "$TEMPLATE" >> "$TARGET"
-    echo "Created file $1.cc"
+# 파일 확장자 및 템플릿 결정
+if [ "$PYTHON_MODE" = true ]; then
+    EXT="py"
+    TEMPLATE="$BASE_DIR/template.py"
+    FOCUS_LINK="$FOCUS_LINK.py"
 else
-    echo "Loaded file $1.cc"
+    EXT="cc"
+    TEMPLATE="$BASE_DIR/template.cc"
+    FOCUS_LINK="$FOCUS_LINK.cc"
 fi
 
-ln -f "$TARGET" "$LINK"
+TARGET="$BASE_DIR/$PROBLEM_NUM.$EXT"
+
+# 파일이 없으면 생성
+if [ ! -f "$TARGET" ]; then
+    if [ "$PYTHON_MODE" = true ]; then
+        echo "# BOJ $PROBLEM_NUM" > "$TARGET"
+    else
+        echo "// BOJ $PROBLEM_NUM" > "$TARGET"
+    fi
+    cat "$TEMPLATE" >> "$TARGET"
+    echo "Created new file: $TARGET"
+else
+    echo "File already exists: $TARGET"
+fi
+
+# focus 링크 변경
+ln -f "$TARGET" "$FOCUS_LINK"
+echo "Focus set to: $TARGET"
 

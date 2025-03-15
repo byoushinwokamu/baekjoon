@@ -6,4 +6,5 @@ a.out
 tempCodeRunnerFile.cpp
 generator.cpp
 auto_focus
+focus.cc
 result
