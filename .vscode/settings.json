@@ -5,6 +5,7 @@
 		"string_view": "cpp",
 		"type_traits": "cpp",
 		"iostream": "cpp",
-		"vector": "cpp"
+		"vector": "cpp",
+		"ostream": "cpp"
 	}
 }
