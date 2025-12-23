@@ -13,42 +13,69 @@ using namespace std;
 typedef long long ll;
 typedef pair<int, int> pp;
 
-vector<int> sel;
+vector<bool> visit;
+vector<bool> visit_temp;
+vector<int> student;
+int inssa, assa;
 
-int main() {
+int dfs(int now) // retval: cycle point
+{
+  visit[now] = true;
+
+  if (now == student[now]) // solo team
+  {
+    inssa++;
+    return now;
+  }
+
+  if (visit_temp[now]) // cycle point 도달
+  {
+    inssa++;
+    return now;
+  }
+
+  visit_temp[now] = true;
+  int cp = dfs(student[now]); // dfs해서 사이클인지 아닌지 알아옴
+
+  if (cp == -1) // no cycle
+    return -1;
+  else if (cp == now) // cycle all marked
+    return -1;
+  else // cycle marking
+  {
+    inssa++;
+    return 0;
+  }
+}
+
+int main()
+{
   cin.tie(0), cout.tie(0), ios::sync_with_stdio(0);
-  int t, n;
+
+  int t;
   cin >> t;
-  while (t--) {
+  while (t--)
+  {
+    int n;
     cin >> n;
-    sel.resize(n);
-    for (int i = 0; i < n; i++) {
-      cin >> sel[i];
-      sel[i]--;
-    }
-    vector<bool> team(n);
-    vector<bool> vis(n);
-    for (int i = 0; i < n; i++) {
-      if (team[i])
-        continue;
-      if (vis[i])
-        continue;
-      vis[i] = true;
+    visit.clear();
+    visit.resize(n);
+    visit_temp.clear();
+    visit_temp.resize(n);
+    student.resize(n);
 
-      int cur;
-      for (cur = sel[i]; !vis[cur]; cur = sel[cur])
-        vis[cur] = true;
-      team[cur] = true;
-      for (int cc = sel[cur]; cc != cur; cc = sel[cc])
-        team[cc] = true;
+    for (int i = 0; i < n; i++)
+    {
+      cin >> student[i];
+      student[i]--;
     }
 
-    // count # of assa
-    int cnt = n;
-    for (auto tt : team)
-      if (tt)
-        cnt--;
-    cout << cnt << '\n';
+    inssa = 0;
+    for (int i = 0; i < n; i++)
+      if (!visit[i])
+        dfs(i);
+
+    cout << n - inssa << '\n';
   }
 
   return 0;
