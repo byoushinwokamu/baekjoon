@@ -16,24 +16,33 @@ int main()
 {
   cin.tie(0), cout.tie(0), ios::sync_with_stdio(0);
   string sa, sb;
-  cin>>sb;
-  while(true)
+  while (true)
   {
+    sa = sb;
+    cin >> sb;
+    if (sa == "#" && sb == "#") break;
     bool cor = true;
 
-    while(sb!="#"){
-      sa=sb;cin>>sb;
+    while (true)
+    {
+      sa = sb;
+      cin >> sb;
+      if (sb == "#") break;
+
+      if (sa.size() != sb.size())
+      {
+        cor = false;
+        continue;
+      }
 
       int cnt = 0;
       int sz = min(sa.size(), sb.size());
-      if(sa.size()!=sb.size()) {cor = false; continue;}
-      for(int i=0;i<sz;i++)
-        if(sa[i]!=sb[i]) cnt++;
-      if(cnt!=1) cor = false;
+      for (int i = 0; i < sz; i++)
+        if (sa[i] != sb[i]) cnt++;
+      if (cnt != 1) cor = false;
     }
 
-    cout<<(cor?"Correct\n":"Incorrect\n");
-    if(sa=="#"&&sb=="#") break;
+    cout << (cor ? "Correct\n" : "Incorrect\n");
   }
 
   return 0;
