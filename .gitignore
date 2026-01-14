@@ -9,3 +9,6 @@ auto_focus
 focus.cc
 focus.py
 result
+tester
+testcase_*.txt
+testresult_*.txt
