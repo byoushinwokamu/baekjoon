@@ -1,4 +1,4 @@
-// BOJ 9527
+// BOJ 18809-2
 #include <algorithm>
 #include <iostream>
 #include <string>
@@ -15,19 +15,6 @@ typedef pair<int, int> pp;
 int main()
 {
   cin.tie(0), cout.tie(0), ios::sync_with_stdio(0);
-  ll a, b;
-  cin >> a >> b;
-  ll cnt = 0;
-  for (a; a <= b; a++)
-  {
-    ll aa = a;
-    while (aa)
-    {
-      if (aa & 1) cnt++;
-      aa >>= 1;
-    }
-  }
-  cout << cnt;
 
   return 0;
 }

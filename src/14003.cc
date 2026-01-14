@@ -1,6 +1,7 @@
 // BOJ 14003
 #include <algorithm>
 #include <iostream>
+#include <stack>
 #include <string>
 #include <vector>
 
@@ -12,42 +13,45 @@ using namespace std;
 typedef long long ll;
 typedef pair<int, int> pp;
 
-int a[1000001];
-int longestlen[1000001];  // 해당 위치에서 가장 긴 증가하는 부분 수열의 길이
-int smallestnum[1000001]; // 해당 길이를 longestlen으로 가지는 가장 작은 a[i]
-int longestest;           // 가장 긴 longestlen
+vector<int> a;  // 원본 수열
+vector<int> p;  // a_i가 sm의 몇 번재 칸에 저장되었는지
+vector<int> sm; // lg값의 최소 등장 a
 
 int main()
 {
   cin.tie(0), cout.tie(0), ios::sync_with_stdio(0);
   int n;
   cin >> n;
+  a.resize(n);
+  p.resize(n);
+  sm.reserve(n);
+  int lgg = 1;
   cin >> a[0];
-  longestlen[0] = 1;
-  smallestnum[1] = a[0];
-  fill(smallestnum + 2, smallestnum + n, __INT32_MAX__);
-  longestest = 1;
+  sm.push_back(a[0]);
+  p[0] = 0;
   for (int i = 1; i < n; i++)
   {
     cin >> a[i];
-    longestlen[i] = 1;
-    int len;
-    for (len = longestest; len > 0; len--)
+    if (sm.back() < a[i])
     {
-      if (smallestnum[len] < a[i])
-      {
-        longestlen[i] = len + 1;
-        break;
-      }
+      p[i] = sm.size();
+      sm.push_back(a[i]);
     }
-    // if (len + 1 >= longestest)
-    smallestnum[len + 1] = min(smallestnum[len + 1], a[i]);
-    longestest = max(longestest, longestlen[i]);
+    else
+    {
+      auto it = lower_bound(sm.begin(), sm.end(), a[i]);
+      *it = a[i], p[i] = it - sm.begin();
+    }
   }
+  cout << sm.size() << '\n';
 
-  cout << longestest << '\n';
-  for (int i = 1; i <= longestest; i++)
-    cout << smallestnum[i] << ' ';
+  stack<int> st;
+  int target = sm.size() - 1;
+  for (int i = n - 1; i >= 0; i--)
+  {
+    if (target == p[i]) target--, st.push(a[i]);
+  }
+  while (!st.empty()) cout << st.top() << ' ', st.pop();
 
   return 0;
 }
