@@ -12,20 +12,42 @@ using namespace std;
 typedef long long ll;
 typedef pair<int, int> pp;
 
-int main() {
-  cin.tie(0), cout.tie(0), ios::sync_with_stdio(0);
-  vector<ll> sq;
-  for (ll i = 1; i * i <= 1'000'001'000'000; i++)
-    sq.push_back(i * i);
+vector<bool> inp(1'000'001); // is not prime number
+vector<ll> prime;
+ll a, b, c;
 
-  ll mi, ma, c = 0;
-  cin >> mi >> ma;
-  for (auto i : sq) {
-    if (ma < i)
-      break;
-    if (mi <= i)
+void dfs(ll now, int idx)
+{
+  // cout << "checked " << now << endl;
+  if (now > b) return;
+  for (; idx < prime.size();)
+  {
+    ll next = now * prime[idx];
+    if (next > b) break;
+    if (next >= a && next <= b)
       c++;
+    if (next < b)
+      dfs(next, idx + 1);
+    idx++;
   }
+}
+
+int main()
+{
+  cin.tie(0), cout.tie(0), ios::sync_with_stdio(0);
+  inp[1] = true;
+  for (ll i = 2; i <= 1'000'001; i++)
+  {
+    if (inp[i]) continue;
+    prime.push_back(i);
+    for (ll j = 2; i * j <= 1'000'001; j++)
+      inp[i * j] = true;
+  }
+  // for (int i = 0; i < 20; i++) cout << prime[i] << endl;
+  // return 0;
+  cin >> a >> b;
+  if (a == 1) c++;
+  dfs(1, 0);
   cout << c;
 
   return 0;
