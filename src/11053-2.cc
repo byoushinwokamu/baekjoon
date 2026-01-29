@@ -1,4 +1,4 @@
-// BOJ 11722
+// BOJ 11053-2
 #include <algorithm>
 #include <iostream>
 #include <string>
@@ -15,20 +15,23 @@ typedef pair<int, int> pp;
 int main()
 {
   cin.tie(0), cout.tie(0), ios::sync_with_stdio(0);
-  int n, a;
+  int n;
   cin >> n;
-  vector<int> lg(n);
-  vector<int> bg(n + 1);
-  int lgg = 1;
+  vector<int> a(n);
+  vector<int> lg(n);     // longest
+  vector<int> sm(n + 1); // smallest
+  int lgg;               // last index of sm
 
-  cin >> a;
+  cin >> a[0];
   lg[0] = 1;
-  bg[1] = a;
+  lgg = 1;
+  sm[1] = a[0];
   for (int i = 1; i < n; i++)
   {
-    cin >> a;
-    lg[i] = lower_bound(bg.begin() + 1, bg.begin() + lgg + 1, a, greater<int>()) - bg.begin();
-    bg[lg[i]] = max(bg[lg[i]], a);
+    cin >> a[i];
+    lg[i] = lower_bound(sm.begin() + 1, sm.begin() + lgg + 1, a[i]) - sm.begin();
+    sm[lg[i]] = (sm[lg[i]] == 0) ? a[i] : min(a[i], sm[lg[i]]);
+
     lgg = max(lgg, lg[i]);
   }
 
