@@ -16,6 +16,7 @@ void usage_err()
   cout << "  tester run           : run all testcases\n";
   cout << "  tester run <num>     : run specific testcase\n";
   cout << "  tester add <num>     : add testcase (Input -> EOF -> Desired -> EOF)\n";
+  cout << "  tester list          : show list of testcase numbers\n";
   cout << "  tester clear         : remove all test files\n";
   cout << "  tester clear <num>   : remove specific test files\n";
   exit(1);
@@ -24,6 +25,31 @@ void usage_err()
 bool file_exists(const string &name)
 {
   return fs::exists(name);
+}
+
+// 현재 디렉토리의 모든 testcase 번호를 가져와 정렬하여 반환
+vector<int> get_testcases()
+{
+  vector<int> cases;
+  for (const auto &entry : fs::directory_iterator("."))
+  {
+    string fname = entry.path().filename().string();
+    if (fname.rfind("testcase_", 0) == 0 && fname.find(".txt") != string::npos)
+    {
+      try
+      {
+        // "testcase_" (9글자) 이후부터 ".txt" 앞까지 숫자 추출
+        string s_num = fname.substr(9, fname.length() - 13);
+        cases.push_back(stoi(s_num));
+      }
+      catch (...)
+      {
+        continue;
+      }
+    }
+  }
+  sort(cases.begin(), cases.end());
+  return cases;
 }
 
 // 파일의 마지막 문자가 개행인지 확인하고, 아니면 개행을 출력해주는 함수
@@ -106,7 +132,7 @@ void run_testcase(const string &num)
   string cmd_show = "cat " + result_file;
   system(cmd_show.c_str());
 
-  // 4. 줄바꿈 보정 (실제 Output 파일 기준)
+  // 4. 줄바꿈 보정
   ensure_newline_on_console(temp_output);
 
   // 5. 정리
@@ -127,31 +153,11 @@ int main(int argc, char **argv)
   {
     if (argc == 3)
     {
-      // tester run <num> : 단일 실행
       run_testcase(num);
     }
     else
     {
-      // tester run : 전체 실행
-      vector<int> cases;
-      for (const auto &entry : fs::directory_iterator("."))
-      {
-        string fname = entry.path().filename().string();
-        if (fname.rfind("testcase_", 0) == 0 && fname.find(".txt") != string::npos)
-        {
-          try
-          {
-            string s_num = fname.substr(9, fname.length() - 13);
-            cases.push_back(stoi(s_num));
-          }
-          catch (...)
-          {
-            continue;
-          }
-        }
-      }
-
-      sort(cases.begin(), cases.end());
+      vector<int> cases = get_testcases(); // 함수 재사용
 
       if (cases.empty())
       {
@@ -173,7 +179,7 @@ int main(int argc, char **argv)
   }
   else if (command == "add")
   {
-    if (argc != 3) usage_err(); // add는 숫자가 필수
+    if (argc != 3) usage_err();
 
     string tc_file = "testcase_" + num + ".txt";
     string ans_file = "testanswer_" + num + ".txt";
@@ -213,11 +219,29 @@ int main(int argc, char **argv)
 
     cout << "\n[Desired Output] Saved. Testcase " << num << " created." << endl;
   }
+  else if (command == "list")
+  {
+    // 목록 출력 기능 구현
+    vector<int> cases = get_testcases();
+
+    if (cases.empty())
+    {
+      cout << "No testcases found." << endl;
+    }
+    else
+    {
+      cout << "Testcase list: ";
+      for (size_t i = 0; i < cases.size(); ++i)
+      {
+        cout << cases[i] << (i == cases.size() - 1 ? "" : " ");
+      }
+      cout << endl;
+    }
+  }
   else if (command == "clear")
   {
     if (argc == 3)
     {
-      // tester clear <num> : 특정 케이스 삭제
       string tc = "testcase_" + num + ".txt";
       string ta = "testanswer_" + num + ".txt";
       string tr = "testresult_" + num + ".txt";
@@ -229,7 +253,6 @@ int main(int argc, char **argv)
     }
     else
     {
-      // tester clear : 전체 삭제
       cout << "Clearing ALL testcase_*, testanswer_*, testresult_* ..." << endl;
       system("rm -f testcase_*.txt testanswer_*.txt testresult_*.txt .temp_output");
       cout << "Done." << endl;
