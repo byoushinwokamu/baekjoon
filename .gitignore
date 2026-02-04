@@ -10,6 +10,7 @@ focus.cc
 focus.py
 result
 tester
+tt
 testcase_*.txt
 testresult_*.txt
 testanswer_*.txt

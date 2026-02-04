@@ -12,10 +12,12 @@ namespace fs = std::filesystem;
 
 void usage_err()
 {
-  cout << "Usage: tester -r <testcase_number> : run tc\n";
-  cout << "              -a                   : run all tcs\n";
-  cout << "              -n <testcase_number> : add tc (Input -> EOF -> Desired Output -> EOF)\n";
-  cout << "              -c                   : clear tcs\n";
+  cout << "Usage:\n";
+  cout << "  tester run           : run all testcases\n";
+  cout << "  tester run <num>     : run specific testcase\n";
+  cout << "  tester add <num>     : add testcase (Input -> EOF -> Desired -> EOF)\n";
+  cout << "  tester clear         : remove all test files\n";
+  cout << "  tester clear <num>   : remove specific test files\n";
   exit(1);
 }
 
@@ -50,7 +52,7 @@ void ensure_newline_on_console(const string &filename)
 void run_testcase(const string &num)
 {
   string input_file = "testcase_" + num + ".txt";
-  string answer_file = "testanswer_" + num + ".txt"; // Desired Output 파일
+  string answer_file = "testanswer_" + num + ".txt";
   string result_file = "testresult_" + num + ".txt";
   string temp_output = ".temp_output";
 
@@ -62,7 +64,7 @@ void run_testcase(const string &num)
 
   cout << "[ Run Testcase " << num << " ]" << endl;
 
-  // 1. 실제 프로그램 실행 (./result < testcase.txt > .temp_output)
+  // 1. 실행
   string cmd_run = "./result < " + input_file + " > " + temp_output;
   int ret = system(cmd_run.c_str());
 
@@ -73,16 +75,16 @@ void run_testcase(const string &num)
     return;
   }
 
-  // 2. testresult 파일 조립
+  // 2. 결과 파일 조립
   ofstream res(result_file);
 
-  // [Input] 섹션
+  // [Input]
   res << "[Input]\n";
   res.close();
   string cmd_append_in = "cat " + input_file + " >> " + result_file;
   system(cmd_append_in.c_str());
 
-  // [Desired Output] 섹션
+  // [Desired Output]
   res.open(result_file, ios::app);
   res << "\n[Desired Output]\n";
   res.close();
@@ -92,28 +94,22 @@ void run_testcase(const string &num)
     string cmd_append_ans = "cat " + answer_file + " >> " + result_file;
     system(cmd_append_ans.c_str());
   }
-  else
-  {
-    // 정답 파일이 없는 경우 (그냥 비워둠)
-    // res.open(result_file, ios::app); res << "(None)\n"; res.close();
-  }
 
-  // [Output] 섹션 (Actual Output)
+  // [Output]
   res.open(result_file, ios::app);
   res << "\n[Output]\n";
   res.close();
   string cmd_append_out = "cat " + temp_output + " >> " + result_file;
   system(cmd_append_out.c_str());
 
-  // 3. 콘솔 출력 (파일 내용을 그대로 보여줌)
-  // -r, -a 모두 동일하게 상세 내용을 보여달라고 하셨으므로 분기 제거
+  // 3. 콘솔 출력
   string cmd_show = "cat " + result_file;
   system(cmd_show.c_str());
 
-  // 4. 마지막 줄바꿈 보정 (Actual Output 끝에 개행 없으면 ----랑 겹치므로)
+  // 4. 줄바꿈 보정 (실제 Output 파일 기준)
   ensure_newline_on_console(temp_output);
 
-  // 5. 임시 파일 정리
+  // 5. 정리
   system(("rm -f " + temp_output).c_str());
 
   cout << "--------------------------------------------------" << endl;
@@ -121,66 +117,64 @@ void run_testcase(const string &num)
 
 int main(int argc, char **argv)
 {
-  if (argc < 2 || argc > 3) usage_err();
-  if (strlen(argv[1]) != 2 || argv[1][0] != '-') usage_err();
+  if (argc < 2) usage_err();
 
-  string num;
-  if (argc == 3) num = argv[2];
+  string command = argv[1];
+  string num = "";
+  if (argc >= 3) num = argv[2];
 
-  switch (argv[1][1])
+  if (command == "run")
   {
-  case 'r': // Run single
-    if (argc != 3) usage_err();
-    run_testcase(num);
-    break;
-
-  case 'a': // Run all
-  {
-    if (argc != 2) usage_err();
-
-    vector<int> cases;
-    for (const auto &entry : fs::directory_iterator("."))
+    if (argc == 3)
     {
-      string fname = entry.path().filename().string();
-      if (fname.rfind("testcase_", 0) == 0 && fname.find(".txt") != string::npos)
+      // tester run <num> : 단일 실행
+      run_testcase(num);
+    }
+    else
+    {
+      // tester run : 전체 실행
+      vector<int> cases;
+      for (const auto &entry : fs::directory_iterator("."))
       {
-        try
+        string fname = entry.path().filename().string();
+        if (fname.rfind("testcase_", 0) == 0 && fname.find(".txt") != string::npos)
         {
-          string s_num = fname.substr(9, fname.length() - 13);
-          cases.push_back(stoi(s_num));
+          try
+          {
+            string s_num = fname.substr(9, fname.length() - 13);
+            cases.push_back(stoi(s_num));
+          }
+          catch (...)
+          {
+            continue;
+          }
         }
-        catch (...)
+      }
+
+      sort(cases.begin(), cases.end());
+
+      if (cases.empty())
+      {
+        cout << "No testcases found." << endl;
+        return 0;
+      }
+
+      for (size_t i = 0; i < cases.size(); ++i)
+      {
+        run_testcase(to_string(cases[i]));
+        if (i < cases.size() - 1)
         {
-          continue;
+          cout << "Press Enter to run next testcase...";
+          cin.get();
+          cout << endl;
         }
       }
     }
-
-    sort(cases.begin(), cases.end());
-
-    if (cases.empty())
-    {
-      cout << "No testcases found." << endl;
-      return 0;
-    }
-
-    for (size_t i = 0; i < cases.size(); ++i)
-    {
-      run_testcase(to_string(cases[i]));
-
-      if (i < cases.size() - 1)
-      {
-        cout << "Press Enter to run next testcase...";
-        cin.get();
-        cout << endl;
-      }
-    }
-    break;
   }
-
-  case 'n': // Add new (Input -> EOF -> Desired -> EOF)
+  else if (command == "add")
   {
-    if (argc != 3) usage_err();
+    if (argc != 3) usage_err(); // add는 숫자가 필수
+
     string tc_file = "testcase_" + num + ".txt";
     string ans_file = "testanswer_" + num + ".txt";
 
@@ -190,7 +184,6 @@ int main(int argc, char **argv)
       exit(1);
     }
 
-    // 1. Input 입력
     cout << "Enter [Input] for " << tc_file << " (Press Ctrl+D to finish):" << endl;
     ofstream file(tc_file);
     if (!file.is_open())
@@ -198,18 +191,17 @@ int main(int argc, char **argv)
       cerr << "Error: Could not create file.\n";
       exit(1);
     }
+
     char ch;
     while (cin.get(ch)) file << ch;
     file.close();
 
-    // EOF 상태 초기화 (매우 중요)
     cin.clear();
-    clearerr(stdin); // 일부 환경 호환성을 위해 추가
+    clearerr(stdin);
 
     cout << "\n[Input] Saved." << endl;
     cout << "Enter [Desired Output] for " << ans_file << " (Press Ctrl+D to finish):" << endl;
 
-    // 2. Desired Output 입력
     ofstream a_file(ans_file);
     if (!a_file.is_open())
     {
@@ -220,18 +212,31 @@ int main(int argc, char **argv)
     a_file.close();
 
     cout << "\n[Desired Output] Saved. Testcase " << num << " created." << endl;
-    break;
   }
+  else if (command == "clear")
+  {
+    if (argc == 3)
+    {
+      // tester clear <num> : 특정 케이스 삭제
+      string tc = "testcase_" + num + ".txt";
+      string ta = "testanswer_" + num + ".txt";
+      string tr = "testresult_" + num + ".txt";
 
-  case 'c': // Clear
-    if (argc != 2) usage_err();
-    cout << "Clearing all testcase_*, testanswer_*, testresult_* ..." << endl;
-    // testanswer_*.txt 삭제 추가
-    system("rm -f testcase_*.txt testanswer_*.txt testresult_*.txt .temp_output");
-    cout << "Done." << endl;
-    break;
-
-  default:
+      cout << "Removing testcase " << num << " files..." << endl;
+      string cmd = "rm -f " + tc + " " + ta + " " + tr;
+      system(cmd.c_str());
+      cout << "Done." << endl;
+    }
+    else
+    {
+      // tester clear : 전체 삭제
+      cout << "Clearing ALL testcase_*, testanswer_*, testresult_* ..." << endl;
+      system("rm -f testcase_*.txt testanswer_*.txt testresult_*.txt .temp_output");
+      cout << "Done." << endl;
+    }
+  }
+  else
+  {
     usage_err();
   }
 
