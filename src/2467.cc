@@ -23,50 +23,19 @@ int main()
   for (int i = 0; i < n; i++) cin >> v[i];
   sort(v.begin(), v.end());
 
-  int san = 0, yom = n - 1;
-  int lft, rht, mid;
-  while (true)
+  int zeroest = 2'000'000'009;
+  int ansl = 0, ansr = n - 1;
+
+  for (int lc = 0; lc < n - 1; lc++)
   {
-    if (v[san] + v[yom] < 0)
-    {
-      // cout << "S" << endl;
-      // move san
-      int sannew = lower_bound(v.begin() + san, v.begin() + yom, -v[yom]) - v.begin();
-      if (sannew + 1 < yom && abs(v[sannew] + v[yom]) > abs(v[sannew + 1] + v[yom]))
-      {
-        sannew++;
-      }
-      if (abs(v[sannew] + v[yom]) > abs(v[san] + v[yom])) sannew = san;
-      if (sannew == san)
-      {
-        cout << v[san] << ' ' << v[yom];
-        break;
-      }
-      san = sannew;
-    }
-    else if (v[san] + v[yom] > 0)
-    {
-      // cout << "Y" << endl;
-      // move yom
-      int yomnew = lower_bound(v.begin() + san + 1, v.begin() + yom + 1, -v[san]) - v.begin();
-      if (san < yomnew + 1 && yomnew + 1 != n && abs(v[san] + v[yomnew]) > abs(v[san] + v[yomnew + 1]))
-      {
-        yomnew++;
-      }
-      if (abs(v[san] + v[yomnew]) > abs(v[san] + v[yom])) yomnew = yom;
-      if (yomnew == yom)
-      {
-        cout << v[san] << ' ' << v[yom];
-        break;
-      }
-      yom = yomnew;
-    }
-    else
-    {
-      cout << v[san] << ' ' << v[yom];
-      break;
-    }
+    int rc = lower_bound(v.begin() + lc + 1, v.end(), -v[lc]) - v.begin();
+    if (rc == n) rc--;
+    if (rc != lc + 1 && abs(v[lc] + v[rc]) > abs(v[lc] + v[rc - 1])) rc--;
+    if (zeroest > abs(v[lc] + v[rc])) zeroest = abs(v[lc] + v[rc]), ansl = lc, ansr = rc;
+    // cout << "l " << lc << " r " << rc << " z " << zeroest << '\n';
   }
+
+  cout << v[ansl] << ' ' << v[ansr];
 
   return 0;
 }

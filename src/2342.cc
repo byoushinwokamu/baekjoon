@@ -13,39 +13,53 @@ using namespace std;
 typedef long long ll;
 typedef pair<int, int> pp;
 
-unsigned int e[100001][5][5];
+int dp[5][5][100005]; // 왼발, 오른발, 노트번호. 숫자: 최소힘
 
-constexpr unsigned int novis = __UINT32_MAX__;
-
-int getpower(const pp &fr, const pp &to)
+int getpow(int a, int b)
 {
+  if (b == 0) return 99;
+  if (a == b) return 1;
+  if (a == 0) return 2;
+  if (a - b == 2 || b - a == 2) return 4;
+  return 3;
 }
 
 int main()
 {
   cin.tie(0), cout.tie(0), ios::sync_with_stdio(0);
-  int n, i;
-  memset(e, 0xffffffff, 100001 * 5 * 5 * sizeof(unsigned int));
-  e[0][0][0] = 0;
+  for (auto &ddp : dp)
+    for (auto &dddp : ddp)
+      fill(dddp, dddp + 100002, 999999);
 
-  cin >> n;
-  for (i = 1; n; i++)
+  int note, i;
+  cin >> note;
+  dp[0][0][0] = 0;
+  for (i = 1; note != 0; i++)
   {
-    int lft, rht;
-
-    rht = n;
-    for (lft = 0; lft < 5; lft++)
+    for (int lft = 0; lft < 5; lft++) // 오른발로 밟는 경우
     {
-      if (lft == n) continue;
+      if (note == lft) continue; // 왼발이 노트에 있을 수 없음
+      for (int rbef = 0; rbef < 5; rbef++)
+        dp[lft][note][i] = min(dp[lft][note][i], dp[lft][rbef][i - 1] + getpow(rbef, note));
+    }
+    for (int rht = 0; rht < 5; rht++) // 왼발로 밟는 경우
+    {
+      if (note == rht) continue; // 오른발이 노트에 있을 수 없음
+      for (int lbef = 0; lbef < 5; lbef++)
+        dp[note][rht][i] = min(dp[note][rht][i], dp[lbef][rht][i - 1] + getpow(lbef, note));
     }
 
-    cin >> n;
+    cin >> note;
   }
-  unsigned int mine = __UINT32_MAX__;
-  for (int k = 0; k < 20; k++)
-    cout << e[i - 1][k] << ' ', mine = min(mine, e[i - 1][k]);
-  // mine = min(mine, e[i - 1][k]);
-  cout << mine;
+
+  int minpow = __INT32_MAX__;
+  for (auto &ddp : dp)
+    for (auto &dddp : ddp)
+    {
+      minpow = min(minpow, dddp[i - 1]);
+    }
+
+  cout << minpow;
 
   return 0;
 }
