@@ -1,4 +1,4 @@
-// BOJ 1753
+// BOJ 1149-1
 #include <algorithm>
 #include <iostream>
 #include <string>
@@ -16,22 +16,21 @@ typedef pair<int, int> pp;
 istream &operator>>(istream &is, pp &p) { return is >> p.fi >> p.se; }
 ostream &operator<<(ostream &os, const pp &p) { return os << p.fi << ' ' << p.se << ' '; }
 
-int v, e, k, a, b, c;
-vector<vector<pp>> adj; // fi: dest, se: cost
-#define dest first
-#define wsum second
-
+int rr, gg, bb, r, g, b, q, w, e;
 int main()
 {
   cin.tie(nullptr), ios_base::sync_with_stdio(false);
-  cin >> v >> e >> k;
-  adj.resize(v + 1);
-  for (int i = 0; i < e; i++) cin >> a >> b >> c, adj[a].push_back({b, c});
-
-  constexpr int INF = 1e9;
-  vector<int> dist(v + 1, INF);
-  dist[k] = 0;
-  for (auto i : adj[k]) dist[i.dest] = i.wsum;
+  int n;
+  cin >> n;
+  for (int i = 0; i < n; i++)
+  {
+    cin >> q >> w >> e;
+    rr = min(g, b) + q;
+    gg = min(r, b) + w;
+    bb = min(r, g) + e;
+    r = rr, g = gg, b = bb;
+  }
+  cout << min({r, g, b});
 
   return 0;
 }
