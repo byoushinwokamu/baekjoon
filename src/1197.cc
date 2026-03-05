@@ -1,4 +1,4 @@
-// BOJ 1197
+// BOJ 1197-p
 #include <algorithm>
 #include <iostream>
 #include <queue>
