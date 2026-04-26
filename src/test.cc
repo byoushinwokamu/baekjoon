@@ -19,6 +19,9 @@ ostream &operator<<(ostream &os, const pp &p) { return os << p.fi << ' ' << p.se
 int main()
 {
   cin.tie(nullptr), ios_base::sync_with_stdio(false);
+  int a[10];
+  a[5001024012] = 1324124;
+  cout << a[23];
 
   return 0;
 }
